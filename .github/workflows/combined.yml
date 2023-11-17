@@ -1,0 +1,40 @@
+name: combined
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    outputs:
+      commitid: ${{ steps.commit.outputs.commitid }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Delete any secrets
+        run: |
+          rm -r **.secret
+
+      - name: Commit optimizations
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Remove secrets
+
+      - name: Set commit head 
+        id: commit
+        run: |
+          SHA=$(git rev-parse HEAD)
+          echo "::set-output name=commitid::$SHA"
+  lint:
+    runs-on: ubuntu-latest
+    needs: optimize
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.optimize.outputs.commitid }}
+      - name: Delete any secrets
+        run: |
+          rm -r **.secret
+          echo "find . -name "**.secret""
