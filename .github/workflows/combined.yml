@@ -15,8 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Delete any secrets
         run: |
-          rm -r **.secret
-
+          find . -type f -name '*.secret' -delete
       - name: Commit optimizations
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -36,5 +35,4 @@ jobs:
           ref: ${{ needs.optimize.outputs.commitid }}
       - name: Delete any secrets
         run: |
-          rm -r **.secret
-          echo "find . -name "**.secret""
+          find . -name "*.secret"
